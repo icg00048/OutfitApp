@@ -1,5 +1,7 @@
 export enum GarmentType {
     Shirt = 'shirt',
+    Tshirt = 'tshirt',
+    Hoodie = 'hoodie',
     Pants = 'pants',
     Dress = 'dress',
     Jacket = 'jacket',
@@ -35,6 +37,7 @@ export enum GarmentType {
 
   export interface Item {
     id: number;
+    imageUrl: string;
     nickname: string;
   
     type: GarmentType;

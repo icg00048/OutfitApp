@@ -1,0 +1,16 @@
+/* src/app/shared/item-card/item-card.component.scss */
+ion-card {
+    overflow: hidden;
+    margin-bottom: 16px;
+    display: inline-block;
+    width: 100%;
+
+    background: transparent;
+    border: 2px solid #000;
+}
+  
+ion-img {
+    width: 100%;
+    height: auto;
+}
+  
