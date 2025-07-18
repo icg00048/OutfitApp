@@ -89,6 +89,17 @@ export class ItemService {
       season: Season.AllYear,
       imageUrl: 'https://i.supersales.de/p/dr-martens-1460.png?imgid=zWaYREVV86C4BSXILBKWyUXwBxN3Pv-mS3lnmRDevYA/q:90/crop:1600:1600:nowe:0:0/h:400/aHR0cHM6Ly9zdXBlcnNhbGVzLmFtczMuY2RuLmRpZ2l0YWxvY2VhbnNwYWNlcy5jb20vMGM1YTg5M2ItZDc5Ny00NGI5LWIyNmEtNGJhN2YxNjk1ZmFmL2RyLW1hcnRlbnMtMTQ2MC5wbmc.png'
     },
+    {
+      id: 8,
+      nickname: 'dunks',
+      type: GarmentType.Sneakers,
+      primaryColor: 'black',
+      pattern: Pattern.Solid,
+      subcategory: Subcategory.Running,
+      occasion: Occasion.Sporty,
+      season: Season.AllYear,
+      imageUrl: 'https://www.hypeplux.de/cdn/shop/files/nike-shox-tl-black-max-orange-w-hypeplux-2.png?v=1715271517&width=1445'
+    },
   ];  
 
   constructor() { }
