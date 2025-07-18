@@ -8,7 +8,7 @@ import {
   IonIcon,
   IonLabel
 } from '@ionic/angular/standalone';
-import { home } from 'ionicons/icons';
+import { home, camera } from 'ionicons/icons';
 
 @Component({
   selector: 'app-layout',
@@ -27,6 +27,7 @@ import { home } from 'ionicons/icons';
 export class LayoutComponent {
 
   public home = home;
+  public camera = camera;
 
   constructor() { }
 
