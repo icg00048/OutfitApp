@@ -1,18 +1,17 @@
-<ion-header>
+<!-- <ion-header>
   <ion-toolbar>
   </ion-toolbar>
-</ion-header>
+</ion-header> -->
 
 <ion-content>
   <ion-searchbar
     [(ngModel)]="searchTerm"
-    placeholder="Buscar prenda..."
+    placeholder="Buscar prenda…"
     debounce="300">
   </ion-searchbar>
   <div class="masonry-container">
-    <app-item-card
-      *ngFor="let item of filteredItems"
-      [item]="item">
-    </app-item-card>
+    <div class="masonry-item" *ngFor="let item of filteredItems">
+      <app-item-card [item]="item"></app-item-card>
+    </div>
   </div>
 </ion-content>

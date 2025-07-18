@@ -1,8 +1,5 @@
 .masonry-container {
   column-count: 2;
-  column-gap: 16px;
-  padding: 16px;
-
   @media (min-width: 768px) {
     column-count: 3;
   }
@@ -11,10 +8,12 @@
 .masonry-item {
   display: inline-block;
   width: 100%;
-  margin-bottom: 16px;
   break-inside: avoid-column;
 }
 
-ion-searchbar{
-  margin: 30px,
+ion-searchbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;            
+  --background: rgba(255,255,255,0.9);
 }
