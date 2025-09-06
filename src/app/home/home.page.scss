@@ -1,4 +1,5 @@
 .masonry-container {
+  margin-top: 10vh;
   column-count: 2;
   @media (min-width: 768px) {
     column-count: 3;
@@ -12,7 +13,8 @@
 }
 
 ion-searchbar {
-  position: sticky;
+  position: fixed;
+  margin-top: 5vh;  
   top: 0;
   z-index: 10;            
   --background: rgba(255,255,255,0.9);

@@ -6,3 +6,7 @@
 <div *ngIf="isLoading" class="spinner">
   <ion-spinner name="crescent"></ion-spinner>
 </div>
+
+<div *ngIf="lastPhoto as preview" class="preview">
+  <img [src]="preview" alt="Last picture took">
+</div>
