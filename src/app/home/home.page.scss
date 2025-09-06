@@ -1,27 +1,21 @@
-#container {
-  text-align: center;
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+.masonry-container {
+  margin-top: 10vh;
+  column-count: 2;
+  @media (min-width: 768px) {
+    column-count: 3;
+  }
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.masonry-item {
+  display: inline-block;
+  width: 100%;
+  break-inside: avoid-column;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
+ion-searchbar {
+  position: fixed;
+  margin-top: 5vh;  
+  top: 0;
+  z-index: 10;            
+  --background: rgba(255,255,255,0.9);
 }

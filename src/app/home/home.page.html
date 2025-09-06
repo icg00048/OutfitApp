@@ -1,20 +1,19 @@
-<ion-header [translucent]="true">
+<!-- <ion-header>
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
   </ion-toolbar>
-</ion-header>
+</ion-header> -->
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+<ion-content>
+  <ion-searchbar
+    slot="fixed"
+    [(ngModel)]="searchTerm"
+    placeholder="Search…"
+    debounce="300"
+    class="fixed-search">
+  </ion-searchbar>
+  <div class="masonry-container">
+    <div class="masonry-item" *ngFor="let item of filteredItems">
+      <app-item-card [item]="item"></app-item-card>
+    </div>
   </div>
 </ion-content>
