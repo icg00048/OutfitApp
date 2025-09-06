@@ -1,0 +1,12 @@
+<ion-button expand="full" (click)="takePhoto()" [disabled]="isLoading">
+  <ion-icon name="camera-outline" slot="start"></ion-icon>
+  {{ isLoading ? 'Cargando…' : 'Abrir Cámara' }}
+</ion-button>
+
+<div *ngIf="isLoading" class="spinner">
+  <ion-spinner name="crescent"></ion-spinner>
+</div>
+
+<div *ngIf="lastPhoto as preview" class="preview">
+  <img [src]="preview" alt="Last picture took">
+</div>

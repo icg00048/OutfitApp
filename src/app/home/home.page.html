@@ -5,9 +5,11 @@
 
 <ion-content>
   <ion-searchbar
+    slot="fixed"
     [(ngModel)]="searchTerm"
-    placeholder="Buscar prenda…"
-    debounce="300">
+    placeholder="Search…"
+    debounce="300"
+    class="fixed-search">
   </ion-searchbar>
   <div class="masonry-container">
     <div class="masonry-item" *ngFor="let item of filteredItems">

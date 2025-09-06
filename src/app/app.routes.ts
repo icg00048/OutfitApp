@@ -11,6 +11,11 @@ export const routes: Routes = [
         loadComponent: () => import('./home/home.page').then(m => m.HomePage)
       },
       {
+        path: 'camera',
+        loadComponent: () =>
+          import('./shared/camera/camera.component').then(m => m.CameraComponent)
+      },
+      {
         path: '',
         redirectTo: '/tabs/home',
         pathMatch: 'full'
