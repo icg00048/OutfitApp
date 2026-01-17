@@ -3,7 +3,7 @@
   </ion-toolbar>
 </ion-header> -->
 
-<ion-content>
+<ion-content> 
   <ion-searchbar
     slot="fixed"
     [(ngModel)]="searchTerm"
@@ -11,7 +11,7 @@
     debounce="300"
     class="fixed-search">
   </ion-searchbar>
-  <div class="masonry-container">
+  <div *ngIf="!isLoading && filteredItems.length" class="masonry-container">
     <div class="masonry-item" *ngFor="let item of filteredItems">
       <app-item-card [item]="item"></app-item-card>
     </div>

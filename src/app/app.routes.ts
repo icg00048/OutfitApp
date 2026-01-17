@@ -23,6 +23,10 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'item/:id',
+    loadComponent: () => import('./item-profile/item-profile.page').then(m => m.ItemProfilePage)
+  },
+  {
     path: '',
     redirectTo: '/tabs/home',
     pathMatch: 'full'

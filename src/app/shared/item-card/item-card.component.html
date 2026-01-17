@@ -1,3 +1,8 @@
-<ion-card class="masonry-item">
-  <ion-img [src]="item.imageUrl" alt="{{ item.nickname }}"></ion-img>
+<ion-card class="masonry-item" [routerLink]="['/item', item.id]" button>
+  <img 
+    [src]="item.imageUrl" 
+    (error)="onImgError($event)"
+    style="width: 100%; height: auto;" 
+    alt="{{ item.nickname }}"
+  />
 </ion-card>
