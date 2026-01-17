@@ -1,22 +1,33 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Camera, CameraResultType, CameraSource, PermissionStatus } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
-import { IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
-import { AlertController } from '@ionic/angular';
+import {
+  IonButton,
+  IonIcon,
+  IonContent,
+  AlertController,
+  ToastController,
+  LoadingController
+} from '@ionic/angular/standalone';
+import { ItemService } from '../../service/item/item.service';
 
 @Component({
   selector: 'app-camera',
-  imports: [CommonModule, IonButton, IonIcon, IonSpinner],
+  imports: [CommonModule, IonButton, IonIcon, IonContent],
   templateUrl: './camera.component.html',
   styleUrls: ['./camera.component.scss'],
 })
 export class CameraComponent {
-  @Output() photoTaken = new EventEmitter<string>();
-  public isLoading = false;
-  public lastPhoto: string | null = null;
+  @Output() photoTaken = new EventEmitter<number>();
 
-  constructor(private alertCtrl: AlertController) {}
+  public isOpeningPicker = false;
+  public isProcessing = false;
+
+  private alertCtrl = inject(AlertController);
+  private toastCtrl = inject(ToastController);
+  private loadingCtrl = inject(LoadingController);
+  private itemService = inject(ItemService);
 
   private async ensureCameraPermission(): Promise<boolean> {
     const platform = Capacitor.getPlatform();
@@ -35,16 +46,6 @@ export class CameraComponent {
     return false;
   }
 
-  private withTimeout<T>(p: Promise<T>, ms = 12000, label = 'operation'): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-      const t = setTimeout(() => reject(new Error(`Timeout waiting for ${label} (${ms}ms)`)), ms);
-      p.then(
-        (v) => { clearTimeout(t); resolve(v); },
-        (e) => { clearTimeout(t); reject(e); }
-      );
-    });
-  }
-
   private async simpleAlert(header: string, message: string) {
     const alert = await this.alertCtrl.create({
       header,
@@ -54,79 +55,160 @@ export class CameraComponent {
     await alert.present();
   }
 
-  async takePhoto() {
-    this.isLoading = true;
-    const platform = Capacitor.getPlatform();
+  private async showToast(message: string, duration = 2500) {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration,
+      position: 'bottom',
+    });
+    await toast.present();
+  }
+
+  async startCaptureFlow() {
+    if (this.isOpeningPicker || this.isProcessing) return;
+
+    const ok = await this.ensureCameraPermission();
+    if (!ok) return;
+
+    const alert = await this.alertCtrl.create({
+      header: 'Select image source',
+      message: 'Where do you want to get the photo from?',
+      buttons: [
+        { text: 'Camera', handler: () => this.captureFrom(CameraSource.Camera) },
+        { text: 'Photo Library', handler: () => this.captureFrom(CameraSource.Photos) },
+        { text: 'Cancel', role: 'cancel' },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  private async captureFrom(source: CameraSource) {
+    if (this.isProcessing) return;
+
+    this.isOpeningPicker = true;
+
     try {
-      const ok = await this.ensureCameraPermission();
-      if (!ok) { this.isLoading = false; return; }
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source,
+      });
 
-      try {
-        const image = await this.withTimeout(
-          Camera.getPhoto({
-            quality: 90,
-            allowEditing: false,
-            resultType: CameraResultType.Uri,
-            source: CameraSource.Camera, 
-          }),
-          12000,
-          'Camera.getPhoto(Camera)'
-        );
-
-        if (image?.webPath) {
-          this.lastPhoto = image.webPath;
-          this.photoTaken.emit(image.webPath);
-          this.isLoading = false;
-          return;
-        }
-      } catch (firstErr) {
-        console.warn('Direct camera attempt failed:', firstErr);
-
-        try {
-          const image = await this.withTimeout(
-            Camera.getPhoto({
-              quality: 90,
-              allowEditing: false,
-              resultType: CameraResultType.Uri,
-              source: CameraSource.Prompt,
-              promptLabelHeader: 'Select source',
-              promptLabelPhoto: 'Photo Library',
-              promptLabelPicture: 'Camera',
-              promptLabelCancel: 'Cancel',
-            }),
-            12000,
-            'Camera.getPhoto(Prompt)'
-          );
-
-          if (image?.webPath) {
-            this.lastPhoto = image.webPath;
-            this.photoTaken.emit(image.webPath);
-            this.isLoading = false;
-            return;
-          }
-
-          // No image returned
-          await this.simpleAlert('No image', 'No image file was obtained.');
-          this.isLoading = false;
-          return;
-        } catch (secondErr) {
-          console.warn('Prompt attempt also failed:', secondErr);
-          await this.simpleAlert(
-            'Could not open the camera',
-            `Details: ${typeof secondErr === 'string' ? secondErr : (secondErr || JSON.stringify(secondErr))}`
-          );
-          this.isLoading = false;
-          return;
-        }
+      if (!image?.webPath) {
+        await this.simpleAlert('No image selected', 'No image was obtained.');
+        return;
       }
+
+      await this.processImageWithBlockingPopup(image.webPath);
+
     } catch (err) {
-      console.warn('General error in takePhoto:', err);
       await this.simpleAlert(
-        'Error',
-        `An unexpected error occurred.\n\n${typeof err === 'string' ? err : (err || JSON.stringify(err))}`
+        'Could not open the camera',
+        `Details: ${typeof err === 'string' ? err : JSON.stringify(err)}`
       );
-      this.isLoading = false;
-      return;
+    } finally {
+      this.isOpeningPicker = false;
     }
+  }
+
+  private async processImageWithBlockingPopup(imagePath: string) {
+    this.isProcessing = true;
+
+    const loading = await this.loadingCtrl.create({
+      message: 'Processing image… Please wait.',
+      backdropDismiss: false,
+    });
+
+    await loading.present();
+
+    try {
+      const imageFile = await this.normalizeImageToJpeg(imagePath);
+
+      await new Promise<void>((resolve, reject) => {
+        this.itemService.createItem({}, imageFile, true).subscribe({
+          next: (item) => {
+            this.photoTaken.emit(item.id);
+            resolve();
+          },
+          error: (err) => reject(err),
+        });
+      });
+
+      await loading.dismiss();
+      await this.showToast('Garment added successfully.', 2000);
+
+    } catch (err) {
+      console.error('Error processing image:', err);
+      await loading.dismiss();
+      await this.simpleAlert(
+        'Processing failed',
+        'We could not process your image. Please try again.'
+      );
+    } finally {
+      this.isProcessing = false;
+    }
+  }
+
+  private async uriToBlob(uri: string): Promise<Blob> {
+    const response = await fetch(uri);
+    return response.blob();
+  }
+
+  private async normalizeImageToJpeg(uri: string): Promise<File> {
+    const blob = await this.uriToBlob(uri);
+    const img = await this.blobToImage(blob);
+
+    const maxSide = 1600;
+    const srcW = img.naturalWidth || img.width;
+    const srcH = img.naturalHeight || img.height;
+
+    const scale = Math.min(1, maxSide / Math.max(srcW, srcH));
+    const dstW = Math.max(1, Math.round(srcW * scale));
+    const dstH = Math.max(1, Math.round(srcH * scale));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = dstW;
+    canvas.height = dstH;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas is not available on this device');
+
+    ctx.drawImage(img, 0, 0, dstW, dstH);
+
+    const jpegBlob = await this.canvasToJpegBlob(canvas, 0.85);
+
+    return new File([jpegBlob], 'photo.jpg', { type: 'image/jpeg' });
+  }
+
+
+  private blobToImage(blob: Blob): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(img);
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Image decoding failed (possibly unsupported format).'));
+      };
+
+      img.src = url;
+    });
+  }
+
+  private canvasToJpegBlob(canvas: HTMLCanvasElement, quality = 0.92): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (b) => (b ? resolve(b) : reject(new Error('JPEG conversion failed'))),
+        'image/jpeg',
+        quality
+      );
+    });
   }
 }

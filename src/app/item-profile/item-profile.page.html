@@ -1,0 +1,89 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Prenda</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div *ngIf="error && !isLoading" class="error-container">
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="item && !isLoading" class="item-profile-container">
+    <div class="image-section">
+      <img 
+        [src]="item.imageUrl" 
+        (error)="onImgError($event)"
+        class="item-image"
+        alt="{{ item.nickname }}"
+      />
+    </div>
+
+    <div class="info-section">
+      <h1 class="item-nickname">{{ item.nickname }}</h1>
+
+      <div class="info-group">
+        <label>Tipo</label>
+        <p class="info-value">{{ item.type }}</p>
+      </div>
+
+      <div class="info-group" *ngIf="item.subcategory">
+        <label>Subcategoría</label>
+        <p class="info-value">{{ item.subcategory }}</p>
+      </div>
+
+      <div class="info-group">
+        <label>Color Principal</label>
+        <div class="color-display">
+          <div class="color-dot" [style.background-color]="item.primaryColor"></div>
+          <p class="info-value">{{ item.primaryColor }}</p>
+        </div>
+      </div>
+
+      <div class="info-group" *ngIf="item.secondaryColor">
+        <label>Color Secundario</label>
+        <div class="color-display">
+          <div class="color-dot" [style.background-color]="item.secondaryColor"></div>
+          <p class="info-value">{{ item.secondaryColor }}</p>
+        </div>
+      </div>
+
+      <div class="info-group">
+        <label>Patrón</label>
+        <p class="info-value">{{ item.pattern }}</p>
+      </div>
+
+      <div class="info-group" *ngIf="item.material">
+        <label>Material</label>
+        <p class="info-value">{{ item.material }}</p>
+      </div>
+
+      <div class="info-group" *ngIf="item.seasons && item.seasons.length">
+        <label>Temporadas</label>
+        <div class="tags">
+          <span class="tag" *ngFor="let season of item.seasons">{{ season }}</span>
+        </div>
+      </div>
+
+      <div class="info-group" *ngIf="item.occasions && item.occasions.length">
+        <label>Ocasiones</label>
+        <div class="tags">
+          <span class="tag" *ngFor="let occasion of item.occasions">{{ occasion }}</span>
+        </div>
+      </div>
+
+      <div class="info-group" *ngIf="item.details && (item.details | keyvalue).length">
+        <label>Detalles</label>
+        <div class="details-list">
+          <div class="detail-item" *ngFor="let detail of item.details | keyvalue">
+            <strong>{{ detail.key }}:</strong> {{ detail.value }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>
