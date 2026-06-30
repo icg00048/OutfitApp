@@ -1,0 +1,105 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/outfits"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Outfit</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="recommendations-page">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando datos...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-container">
+    <p>{{ error }}</p>
+    <ion-button (click)="loadInitialData()">Reintentar</ion-button>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading && !error" class="recommendations-wrapper">
+    <!-- Controls Section -->
+    <div class="controls-section">
+      <div class="occasion-control">
+        <label>Ocasion</label>
+        <ion-select
+          [(ngModel)]="selectedOccasion"
+          class="occasion-select">
+          <ion-select-option *ngFor="let occ of occasions" [value]="occ">
+            {{ occ }}
+          </ion-select-option>
+        </ion-select>
+      </div>
+
+      <ion-button
+        (click)="generateRecommendations()"
+        [disabled]="isProcessing"
+        color="primary"
+        class="generate-btn">
+        <ion-icon name="sparkles-outline" slot="start"></ion-icon>
+        {{ isProcessing ? 'Generating...' : 'Generate' }}
+      </ion-button>
+
+      <ion-button
+        (click)="shuffleOutfit()"
+        [disabled]="recommendations.length === 0 || isProcessing"
+        color="secondary"
+        class="shuffle-btn">
+        <ion-icon name="shuffle-outline" slot="start"></ion-icon>
+        Suffle
+      </ion-button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="recommendations.length === 0" class="empty-state">
+      <ion-icon name="image-outline"></ion-icon>
+      <p>There are no recommendations available. Please try generating some.</p>
+    </div>
+
+    <!-- Outfit Canvas and Details -->
+    <div *ngIf="recommendations.length > 0" class="content-wrapper">
+      <!-- Main Outfit Canvas -->
+      <div class="outfit-section">
+        <app-free-canvas
+          [items]="canvasItems"
+          [canvasHeight]="'500px'"
+          (itemsTransformed)="onCanvasTransformed($event)">
+        </app-free-canvas>
+
+        <!-- Score and Reasons Card -->
+        <ion-card class="reasons-card">
+          <ion-card-content>
+            <div class="score-section">
+              <span class="score-label">Compatibilidad:</span>
+              <span class="score-value">{{ currentRecommendation?.score?.toFixed(1) ?? 'N/A' }}</span>
+            </div>
+
+            <button
+              class="reasons-toggle"
+              (click)="toggleReasons()">
+              <span>Razones</span>
+              <ion-icon [name]="reasonsExpanded ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+            </button>
+
+            <div *ngIf="reasonsExpanded" class="reasons-list">
+              <p *ngFor="let reason of currentRecommendation?.reasons" class="reason-item">
+                • {{ reason }}
+              </p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- Side Panel: Outfit Items -->
+      <app-outfit-items-panel
+        [items]="outfitItems"
+        (removeShoe)="removeShoe()"
+        (saveOutfit)="saveOutfit()">
+      </app-outfit-items-panel>
+    </div>
+  </div>
+</ion-content>

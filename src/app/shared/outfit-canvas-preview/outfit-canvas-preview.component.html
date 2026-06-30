@@ -1,0 +1,20 @@
+<div class="canvas-preview-container">
+  <div class="canvas-background">
+    <div class="canvas-items">
+      <div class="canvas-stage" [ngStyle]="stageStyle">
+        <div
+          *ngFor="let canvasItem of canvasItems"
+          class="canvas-item"
+          [ngStyle]="getItemStyle(canvasItem)"
+        >
+          <img
+            *ngIf="canvasItem.imageUrl"
+            [src]="canvasItem.imageUrl"
+            [alt]="getSlotLabel(canvasItem.slotId)"
+            class="item-image"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

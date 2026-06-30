@@ -1,0 +1,82 @@
+<ion-content class="saved-outfits">
+  <!-- Top bar inside content -->
+  <div class="top-actions">
+    <div class="title-block">
+      <h1>My outfits</h1>
+      <p>Save your favorite combinations and create new ones when you want.</p>
+    </div>
+
+    <ion-button
+      class="create-btn"
+      fill="solid"
+      color="primary"
+      routerLink="/outfits/recommendations">
+      Create new outfit
+    </ion-button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="state state--loading">
+    <ion-spinner name="circular"></ion-spinner>
+    <p>Loading outfits...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="hasError && !isLoading" class="state state--error">
+    <ion-text color="danger">
+      <h2>Error</h2>
+      <p>{{ errorMessage }}</p>
+    </ion-text>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!isLoading && !hasError && outfits.length === 0" class="state state--empty">
+    <ion-text color="medium">
+      <h2>No saved outfits</h2>
+      <p>Press “Create new” to generate recommendations and save your first outfit.</p>
+    </ion-text>
+
+    <ion-button color="primary" routerLink="/outfits/recommendations">
+      Create my first outfit
+    </ion-button>
+  </div>
+
+  <!-- Grid -->
+  <div *ngIf="!isLoading && !hasError && outfits.length > 0" class="grid">
+    <ion-card
+      *ngFor="let outfit of outfits"
+      class="card"
+      (click)="onOutfitClick(outfit.id)"
+      button
+    >
+      <ion-card-content>
+        <div class="card-head">
+          <div class="head-left">
+            <span class="badge">{{ getOccasionLabel(outfit.occasion) }}</span>
+            <span class="date">{{ formatDate(outfit.createdAt) }}</span>
+          </div>
+          <ion-button
+            fill="clear"
+            color="danger"
+            class="delete-btn"
+            size="small"
+            (click)="confirmDelete(outfit.id, $event)">
+            <ion-icon [icon]="trash"></ion-icon>
+          </ion-button>
+        </div>
+
+        <div class="preview">
+          <app-outfit-canvas-preview
+            [items]="getOutfitItems(outfit)"
+            [transforms]="outfit.transforms || []"
+          ></app-outfit-canvas-preview>
+        </div>
+
+        <div class="card-foot">
+          <span class="id">Outfit #{{ outfit.id }}</span>
+          <span class="chev">›</span>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
