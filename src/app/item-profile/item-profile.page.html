@@ -3,7 +3,15 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home"></ion-back-button>
     </ion-buttons>
-    <ion-title>Prenda</ion-title>
+    <ion-buttons slot="end" *ngIf="item && !editing">
+      <ion-button color="medium" (click)="startEdit()">
+        <ion-icon [icon]="pencil"></ion-icon>
+      </ion-button>
+      <ion-button color="danger" (click)="confirmDelete(item.id, $event)">
+        <ion-icon [icon]="trash"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Item Profile</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -13,7 +21,53 @@
     <p>{{ error }}</p>
   </div>
 
-  <div *ngIf="item && !isLoading" class="item-profile-container">
+  <div *ngIf="item && editing" class="edit-card">
+    <div class=" ">Edit Item</div>
+    <div class="form-row">
+      <label>Name</label>
+      <input type="text" [(ngModel)]="editForm.name" />
+    </div>
+    <div class="form-row">
+      <label>Category</label>
+      <ion-select [(ngModel)]="editForm.category" interface="popover" placeholder="Select category">
+        <ion-select-option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </ion-select-option>
+      </ion-select>
+    </div>
+    <div class="form-row">
+      <label>Primary Color</label>
+
+      <div class="selected-color-preview" *ngIf="editForm.color">
+        <span
+          class="selected-color-preview__swatch"
+          [style.background]="getColorHex(editForm.color)"
+        ></span>
+        <span>{{ getColorLabel(editForm.color) }}</span>
+      </div>
+
+      <ion-select
+        [(ngModel)]="editForm.color"
+        interface="popover"
+        placeholder="Select color"
+      >
+        <ion-select-option *ngFor="let color of colors" [value]="color">
+          {{ getColorLabel(color) }}
+        </ion-select-option>
+      </ion-select>
+    </div>
+    <div class="form-row">
+      <label>Description</label>
+      <textarea rows="3" [(ngModel)]="editForm.description"></textarea>
+    </div>
+    <div class="form-actions">
+      <ion-button color="primary" (click)="saveChanges()" [disabled]="isSaving">Save</ion-button>
+      <ion-button fill="outline" color="medium" (click)="cancelEdit()">Cancel</ion-button>
+    </div>
+    <p *ngIf="saveError" class="error-text">{{ saveError }}</p>
+  </div>
+
+  <div *ngIf="item && !editing && !isLoading" class="item-profile-container">
     <div class="image-section">
       <img 
         [src]="item.imageUrl" 
@@ -26,63 +80,64 @@
     <div class="info-section">
       <h1 class="item-nickname">{{ item.nickname }}</h1>
 
-      <div class="info-group">
-        <label>Tipo</label>
-        <p class="info-value">{{ item.type }}</p>
-      </div>
-
-      <div class="info-group" *ngIf="item.subcategory">
-        <label>Subcategoría</label>
-        <p class="info-value">{{ item.subcategory }}</p>
-      </div>
-
-      <div class="info-group">
-        <label>Color Principal</label>
-        <div class="color-display">
-          <div class="color-dot" [style.background-color]="item.primaryColor"></div>
-          <p class="info-value">{{ item.primaryColor }}</p>
-        </div>
-      </div>
-
-      <div class="info-group" *ngIf="item.secondaryColor">
-        <label>Color Secundario</label>
-        <div class="color-display">
-          <div class="color-dot" [style.background-color]="item.secondaryColor"></div>
-          <p class="info-value">{{ item.secondaryColor }}</p>
-        </div>
-      </div>
-
-      <div class="info-group">
-        <label>Patrón</label>
-        <p class="info-value">{{ item.pattern }}</p>
-      </div>
-
-      <div class="info-group" *ngIf="item.material">
-        <label>Material</label>
-        <p class="info-value">{{ item.material }}</p>
-      </div>
-
-      <div class="info-group" *ngIf="item.seasons && item.seasons.length">
-        <label>Temporadas</label>
-        <div class="tags">
-          <span class="tag" *ngFor="let season of item.seasons">{{ season }}</span>
-        </div>
-      </div>
-
-      <div class="info-group" *ngIf="item.occasions && item.occasions.length">
-        <label>Ocasiones</label>
-        <div class="tags">
-          <span class="tag" *ngFor="let occasion of item.occasions">{{ occasion }}</span>
-        </div>
-      </div>
-
-      <div class="info-group" *ngIf="item.details && (item.details | keyvalue).length">
-        <label>Detalles</label>
-        <div class="details-list">
-          <div class="detail-item" *ngFor="let detail of item.details | keyvalue">
-            <strong>{{ detail.key }}:</strong> {{ detail.value }}
+      <div class="info-grid">
+        <section class="info-card">
+          <div class="card-header">Information</div>
+          <div class="info-row">
+            <span class="row-label">Type</span>
+            <span class="row-value">{{ item.type }}</span>
           </div>
-        </div>
+          <div class="info-row" *ngIf="item.subcategory">
+            <span class="row-label">Subcategory</span>
+            <span class="row-value">{{ item.subcategory }}</span>
+          </div>
+          <div class="info-row">
+            <span class="row-label">Pattern</span>
+            <span class="row-value">{{ item.pattern }}</span>
+          </div>
+          <div class="info-row" *ngIf="item.material">
+            <span class="row-label">Material</span>
+            <span class="row-value">{{ item.material }}</span>
+          </div>
+          <div class="info-row" *ngIf="item.description">
+            <span class="row-label">Description</span>
+            <span class="row-value">{{ item.description }}</span>
+          </div>
+        </section>
+
+        <section class="info-card">
+          <div class="card-header">Colors</div>
+          <div class="info-row">
+            <span class="row-label">Primary</span>
+            <span class="row-value color-cell">
+              <span class="color-dot" [style.background-color]="item.primaryColor"></span>
+              {{ item.primaryColor }}
+            </span>
+          </div>
+          <div class="info-row" *ngIf="item.secondaryColor">
+            <span class="row-label">Secondary</span>
+            <span class="row-value color-cell">
+              <span class="color-dot" [style.background-color]="item.secondaryColor"></span>
+              {{ item.secondaryColor }}
+            </span>
+          </div>
+        </section>
+
+        <section class="info-card">
+          <div class="card-header">Context</div>
+          <div class="info-row" *ngIf="item.seasons && item.seasons.length">
+            <span class="row-label">Seasons</span>
+            <span class="row-value">
+              <span class="tag" *ngFor="let season of item.seasons">{{ season }} </span>
+            </span>
+          </div>
+          <div class="info-row" *ngIf="item.occasions && item.occasions.length">
+            <span class="row-label">Occasions</span>
+            <span class="row-value">
+              <span class="tag" *ngFor="let occasion of item.occasions">{{ occasion }}</span>
+            </span>
+          </div>
+        </section>
       </div>
     </div>
   </div>

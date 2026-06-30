@@ -61,5 +61,9 @@
 	<string>We need access to save the photo to your library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We use your location to recommend outfits based on the local weather.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We use your location to recommend outfits based on the local weather.</string>
 </dict>
 </plist>

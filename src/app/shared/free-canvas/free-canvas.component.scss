@@ -1,0 +1,47 @@
+.canvas-preview-container {
+  width: 100%;
+}
+
+.canvas-background {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 180px;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+
+  /* opcional: un borde suave para distinguir el área */
+  border: 1px solid var(--ion-color-step-150, #e6e6e6);
+}
+
+.canvas-wrapper {
+  position: absolute;
+  inset: 0;
+}
+
+.canvas-items {
+  position: absolute;
+  inset: 0;
+}
+
+/* IMPORTANTE: dar tamaño al contenedor del item */
+.canvas-item {
+  position: absolute;
+
+  /* tamaño base (ajústalo a tu gusto) */
+  width: 84px;
+  height: 84px;
+
+  /* si estás centrando con translate(-50%, -50%) en el style,
+     esto lo hace más consistente */
+  transform-origin: center center;
+}
+
+/* La imagen debe llenar el contenedor del item */
+.item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}

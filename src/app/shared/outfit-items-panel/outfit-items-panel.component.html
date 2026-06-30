@@ -1,0 +1,41 @@
+<div class="items-panel">
+  <div class="panel-header">
+    <h3>Prendas del Outfit</h3>
+    <span class="item-count">{{ items.length }} elementos</span>
+  </div>
+
+  <div class="outfit-items-list">
+    <a *ngFor="let item of items" [routerLink]="['/item', item.id]" class="outfit-item-link">
+      <div class="outfit-item">
+        <ion-thumbnail class="item-thumbnail">
+          <img [src]="getImageUrl(item)" [alt]="item.nickname" />
+        </ion-thumbnail>
+
+        <div class="item-info">
+          <p class="item-name">{{ item.nickname }}</p>
+          <p class="item-type">{{ item.type }}</p>
+        </div>
+
+        <!-- Remove button for shoes only -->
+        <ion-button
+          *ngIf="item.slotId === 'shoes'"
+          fill="clear"
+          size="small"
+          (click)="onRemoveShoe($event)"
+          class="remove-btn">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </a>
+  </div>
+
+  <!-- Save Outfit Button -->
+  <ion-button
+    expand="full"
+    color="success"
+    (click)="onSaveOutfit()"
+    class="save-outfit-btn">
+    <ion-icon name="download-outline" slot="start"></ion-icon>
+    Guardar Outfit
+  </ion-button>
+</div>

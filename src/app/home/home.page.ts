@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonHeader, IonToolbar, IonContent, IonSearchbar, InfiniteScrollCustomEvent } from '@ionic/angular/standalone';
@@ -6,6 +6,8 @@ import { Item } from '../model/item.model';
 import { ItemService } from '../service/item/item.service';
 import { ItemCardComponent } from '../shared/item-card/item-card.component';
 import { catchError, finalize, of } from 'rxjs';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -24,6 +26,7 @@ import { catchError, finalize, of } from 'rxjs';
 })
 export class HomePage {
   private itemService = inject(ItemService);
+  private destroy$ = new Subject<void>();
 
   isLoading = false;
   error: string | null = null;
@@ -36,6 +39,14 @@ export class HomePage {
 
   constructor() {
     this.loadItems();
+    this.itemService.itemsChanged$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadItems());
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadItems(event?: InfiniteScrollCustomEvent) {

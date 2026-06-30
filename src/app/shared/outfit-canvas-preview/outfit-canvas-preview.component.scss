@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.canvas-background {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 180px;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.canvas-items {
+  position: absolute;
+  inset: 0;
+}
+
+.canvas-stage {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+}
+
+.canvas-item {
+  position: absolute;
+}
+
+.item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}

@@ -1,6 +1,7 @@
 export enum GarmentType {
   Tshirt = 'tshirt',
   Shirt = 'shirt',
+  Jersey = 'jersey',
   Polo = 'polo',
   Hoodie = 'hoodie',
   Sweater = 'sweater',
@@ -152,4 +153,6 @@ export interface Item {
   tempRange?: TemperatureRange;
 
   details?: Record<string, string | number | boolean | null>;
+  description?: string | null;
+  tags?: string[];
 }

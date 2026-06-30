@@ -1,0 +1,20 @@
+<div class="free-canvas-wrapper" [style.height]="canvasHeight">
+  <div #canvas class="canvas-container" [attr.data-canvas]="true">
+    <div
+      *ngFor="let item of items; trackBy: trackByItemId"
+      #itemEl
+      class="canvas-item"
+      [attr.data-item-id]="item.id"
+      [style.transform]="getItemTransformSafe(item.id)"
+      [style.z-index]="getItemState(item.id)?.zIndex ?? 1"
+    >
+      <img
+        [src]="getImageUrl(item.imageUrl)"
+        [alt]="'Item ' + item.id"
+        class="item-image"
+        (error)="onImgError($event)"
+        draggable="false"
+      />
+    </div>
+  </div>
+</div>
