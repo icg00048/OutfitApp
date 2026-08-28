@@ -10,6 +10,18 @@ The frontend must call the backend through the value configured in `src/environm
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/01_my_outfits.png" width="200" />
+  <img src="docs/screenshots/02_item_profile.png" width="200" />
+  <img src="docs/screenshots/03_item_detail.png" width="200" />
+  <img src="docs/screenshots/04_wardrobe_grid.png" width="200" />
+</p>
+
+---
+
+
 ## 1. Repository structure
 
 Recommended project layout:
